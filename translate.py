@@ -3,8 +3,23 @@
 import sys
 
 def translate_sequence(rna_sequence, genetic_code):
+    amino = ""
+    seq = rna_sequence.upper()
+    for i in range(0,len(seq)-len(seq)%3,3):
+        if len(seq)%3 != 0:
+            r = len(seq)%3
+            seq = rna_sequence[:len(rna_sequence)-r]
+            if genetic_code[seq[i:i+3]] == "*":
+                break
+            else:
+                amino += genetic_code[seq[i:i+3]]
+        elif len(seq)%3 == 0:
+            if genetic_code[seq[i:i+3]] == "*":
+                break
+            else:
+                amino += genetic_code[seq[i:i+3]]
+    return amino
     """Translates a sequence of RNA into a sequence of amino acids.
-
     Translates `rna_sequence` into string of amino acids, according to the
     `genetic_code` given as a dict. Translation begins at the first position of
     the `rna_sequence` and continues until the first stop codon is encountered
@@ -28,9 +43,33 @@ def translate_sequence(rna_sequence, genetic_code):
     str
         A string of the translated amino acids.
     """
-    pass
 
 def get_all_translations(rna_sequence, genetic_code):
+    amino_acids = []
+    pep = []
+    seq = rna_sequence.upper()
+    frames = [seq[i:i+3] for i in range(0, len(seq))]
+    for i in range(0, len(seq)):
+        frames = []
+        frames.append([seq[i:i+3] for i in range(0,len(seq),3)])
+        frames.append([seq[i:i+3] for i in range(1,len(seq),3)])
+        frames.append([seq[i:i+3] for i in range(2,len(seq),3)])
+    for i in range(0,len(frames)):
+        start = 0 #changing this number removes the number of peptides we can find
+        while start < len(frames[i]):
+            if frames[i][start] == "AUG":
+                #amino_acids.append(frames[i][start:]) 
+                for stop in range(start,len(frames[i])):
+                    if frames[i][stop]=="UAA" or  frames[i][stop]=="UGA" or frames[i][stop]=="UAG":
+                        amino_acids.append(frames[i][start:stop])
+                        start=stop+1
+                        break
+                                 
+            start+=1
+    for i in range(0,len(amino_acids),1):
+       final_seq = ''.join(amino_acids[i])
+       pep.append(translate_sequence(final_seq,genetic_code))
+    return pep
     """Get a list of all amino acid sequences encoded by an RNA sequence.
 
     All three reading frames of `rna_sequence` are scanned from 'left' to
@@ -61,9 +100,14 @@ def get_all_translations(rna_sequence, genetic_code):
         A list of strings; each string is an sequence of amino acids encoded by
         `rna_sequence`.
     """
-    pass
 
 def get_reverse(sequence):
+    rev = sequence[::-1]
+    rev = rev.upper()
+    if sequence is None:
+    	rev = ""
+    return rev
+
     """Reverse orientation of `sequence`.
 
     Returns a string with `sequence` in the reverse order.
@@ -75,9 +119,12 @@ def get_reverse(sequence):
     >>> get_reverse('AUGC')
     'CGUA'
     """
-    pass
 
 def get_complement(sequence):
+    seq = sequence.upper()
+    comp = seq.replace('A', 'u').replace('U', 'a').replace('C', 'g').replace('G', 'c')
+    comp = comp.upper()
+    return comp
     """Get the complement of a `sequence` of nucleotides.
 
     Returns a string with the complementary sequence of `sequence`.
@@ -89,9 +136,13 @@ def get_complement(sequence):
     >>> get_complement('AUGC')
     'UACG'
     """
-    pass
 
 def reverse_and_complement(sequence):
+    rev = sequence[::-1]
+    rev = rev.upper()
+    comp = rev.replace('A', 'u').replace('U', 'a').replace('C', 'g').replace('G', 'c')
+    comp_rev = comp.upper()
+    return comp_rev
     """Get the reversed and complemented form of a `sequence` of nucleotides.
 
     Returns a string that is the reversed and complemented sequence
@@ -104,7 +155,7 @@ def reverse_and_complement(sequence):
     >>> reverse_and_complement('AUGC')
     'GCAU'
     """
-    pass
+    
 
 def get_longest_peptide(rna_sequence, genetic_code):
     """Get the longest peptide encoded by an RNA sequence.
@@ -132,8 +183,7 @@ def get_longest_peptide(rna_sequence, genetic_code):
     str
         A string of the longest sequence of amino acids encoded by
         `rna_sequence`.
-    """
-    pass
+    """    
 
 
 if __name__ == '__main__':
