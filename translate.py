@@ -54,6 +54,7 @@ def get_all_translations(rna_sequence, genetic_code):
         frames.append([seq[i:i+3] for i in range(0,len(seq),3)])
         frames.append([seq[i:i+3] for i in range(1,len(seq),3)])
         frames.append([seq[i:i+3] for i in range(2,len(seq),3)])
+    print(frames)
     for i in range(0,len(frames)):
         start = 0 #changing this number removes the number of peptides we can find
         while start < len(frames[i]):
@@ -70,6 +71,13 @@ def get_all_translations(rna_sequence, genetic_code):
        final_seq = ''.join(amino_acids[i])
        pep.append(translate_sequence(final_seq,genetic_code))
     return pep
+    
+# You are getting close on this! If you look at the error messages, you will see that it is printing one protein sequences in some cases where it expects 2. 
+# It looks like your code is only grabbing a start codon if the protein sequence has a stop codon with the given start codon.
+# It should be set to start coding at a start codon, even if there is not a stop codon in that reading frame.
+# See if you can change your for stop in range() for loop to use .append on your amino_acids even if you don't run into a stop codon.
+
+
     """Get a list of all amino acid sequences encoded by an RNA sequence.
 
     All three reading frames of `rna_sequence` are scanned from 'left' to
