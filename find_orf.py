@@ -1,3 +1,4 @@
+
 #! /usr/bin/env python3
 
 import sys
@@ -57,17 +58,19 @@ def vet_nucleotide_sequence(sequence):
     # any valid RNA and DNA sequence strings, respectively (and only strings of
     # RNA and DNA bases).
     # Read the docstring above for additional clues.
-    rna_pattern_str = r'AUCG'
-    dna_pattern_str = r'ATCG'
+    rna_pattern_str = r'^[ACGUacgu]+$'
+    dna_pattern_str = r'^[ACGTacgt]+$'
     ##########################################################################
 
     rna_pattern = re.compile(rna_pattern_str)
     dna_pattern = re.compile(dna_pattern_str)
 
+    if not sequence:
+        return None
     if rna_pattern.match(sequence):
-        return
+        return None
     if dna_pattern.match(sequence):
-        return
+        return None
     else:
         raise Exception("Invalid sequence: {0!r}".format(sequence))
 
@@ -119,7 +122,7 @@ def vet_codon(codon):
     # Change `codon_pattern_str` so that it will match any valid codons, and
     # only valid codons.
     # Read the docstring above for additional clues.
-    codon_pattern_str = r'AUG'
+    codon_pattern_str = r'^[ACGUacgu]{3}$'
     ##########################################################################
 
     codon_pattern = re.compile(codon_pattern_str)
@@ -177,6 +180,7 @@ def find_first_orf(sequence,
     >>> find_first_orf('CCAUGGUAUAACC', ['AUG'], ['UAA'])
     'AUGGUAUAA'
     """
+
     # Make sure the sequence is valid
     vet_nucleotide_sequence(sequence)
 
@@ -207,7 +211,9 @@ def find_first_orf(sequence,
     # exactly. Change `orf_pattern_str` so that it will match any open reading
     # frame.
     # Read the docstring above for additional clues.
-    orf_pattern_str = r'AUGGUAUAA'
+
+    orf_pattern_str = r'(?<!U)AUG(?:[ACGUacgu]{3})*?(?:UAA|UAG|UGA)'
+    #orf_pattern_str = r'(?<!U)({})(?:[ACGUacgu]{3})*?({})'.format(start_codons,stop_codons)
     ##########################################################################
 
     # Create the regular expression object
@@ -217,7 +223,6 @@ def find_first_orf(sequence,
     if match_object:
         return match_object.group()
     return ''
-
 
 def parse_sequence_from_path(path):
     # Try to open the path to read from it, and handle exceptions if they
