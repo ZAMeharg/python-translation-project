@@ -60,7 +60,7 @@ def get_all_translations(rna_sequence, genetic_code):
         start = 0 #changing this number removes the number of peptides we can find
         while start < len(frames[i]):
             if frames[i][start] == "AUG":
-                #amino_acids.append(frames[i][start:]) 
+                amino_acids.append(frames[i][start:]) 
                 for stop in range(start,len(frames[i])):
                     if frames[i][stop]=="UAA" or  frames[i][stop]=="UGA" or frames[i][stop]=="UAG":
                         amino_acids.append(frames[i][start:stop])
@@ -69,11 +69,10 @@ def get_all_translations(rna_sequence, genetic_code):
                                  
             start+=1
         #print(amino_acids)
-    for i in range(0,len(amino_acids),1):
+    for i in range(0,len(amino_acids),2):
        final_seq = ''.join(amino_acids[i])
        pep.append(translate_sequence(final_seq,genetic_code))
     return pep
-    
 # You are getting close on this! If you look at the error messages, you will see that it is printing one protein sequences in some cases where it expects 2. 
 # It looks like your code is only grabbing a start codon if the protein sequence has a stop codon with the given start codon.
 # It should be set to start coding at a start codon, even if there is not a stop codon in that reading frame.
@@ -168,6 +167,20 @@ def reverse_and_complement(sequence):
     
 
 def get_longest_peptide(rna_sequence, genetic_code):
+    #Getting the 1st 3 reading frames for the foreward strand of DNA
+    reading_frames = []
+    foward_translastions = get_all_translations(rna_sequence, genetic_code)
+    reveres_seq = reverse_and_complement(rna_sequence)
+    reverse_translations = get_all_translations(reveres_seq, genetic_code)
+    reading_frames += foward_translastions
+    reading_frames += reverse_translations 
+
+    if len(reading_frames) == 0:
+        return ""
+    else:
+        reading_frames.sort(key = len)
+        return(reading_frames[-1])
+
     """Get the longest peptide encoded by an RNA sequence.
 
     Explore six reading frames of `rna_sequence` (the three reading frames of
